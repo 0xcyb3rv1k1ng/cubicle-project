@@ -6,17 +6,30 @@ var logger = require('morgan');
 const hbs = require('hbs');
 const mongoose = require('mongoose');
 
-var indexRouter = require('./routes/index');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const User = require('./models/user');
+
+var ensureAuthenticated = function(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  else res.redirect('/login');
+};
+
+// required router scripts
 const aboutRouter = require('./routes/about');
-const createRouter = require('./routes/create');
-const detailsRouter = require('./routes/details');
-const notFound404Router = require('./routes/404');
-const createAccessoryRouter = require('./routes/createAccessory');
 const attachAccessoryRouter = require('./routes/attachAccessory');
-const editCubeRouter = require('./routes/editCube');
+const cookieRouter = require('./routes/cookie');
+const createAccessoryRouter = require('./routes/createAccessory');
+const createRouter = require('./routes/create');
 const deleteCubeRouter = require('./routes/deleteCube');
-
-
+const detailsRouter = require('./routes/details');
+const editCubeRouter = require('./routes/editCube');
+const indexRouter = require('./routes/index');
+const loginRouter = require('./routes/login');
+const logoutRouter = require('./routes/logout');
+const notFound404Router = require('./routes/404');
+const registerRouter = require('./routes/register');
+const searchRouter = require('./routes/search');
 
 var app = express();
 
@@ -44,17 +57,45 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// used to intialize passport session
+app.use(require('express-session')({
+  secret: process.env.EXP_SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
+// need to separate protected routes and unprotected routes
+
+// unprotected routes
 app.use('/', indexRouter);
-app.use('/404', notFound404Router);
+app.use('/search', searchRouter);
 app.use('/about', aboutRouter);
-app.use('/create', createRouter);
 app.use('/details', detailsRouter);
+app.use('/login', loginRouter);
+app.use('/register', registerRouter);
+app.use('/404', notFound404Router);
+
+
+// protected routes
+app.use(ensureAuthenticated);
+app.use('/create', createRouter);
 app.use('/createAccessory', createAccessoryRouter);
-app.use('/attach-accessory', attachAccessoryRouter);
-app.use('/edit-cube', editCubeRouter);
-app.use('/delete-cube', deleteCubeRouter);
+app.use('/attachAccessory', attachAccessoryRouter);
+app.use('/editCube', editCubeRouter);
+app.use('/deleteCube', deleteCubeRouter);
+app.use('/cookie', cookieRouter);
+app.use('/logout', logoutRouter);
+
+// passport
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 // catch 404 and forward to error handler

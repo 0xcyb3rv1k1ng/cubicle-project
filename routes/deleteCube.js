@@ -18,11 +18,16 @@ router.get('/:uid', function (req, res, next) {
 /*DELETE*/
 router.post("/:uid", function (req, res, next) {
     let selectedCubeId = req.params.uid;
+    console.log('deleting this', selectedCubeId);    
 
-    Cube.findOneAndDelete(
-        { _id: selectedCubeId },
-        err => { if (err) { console.log(err);}}
-    );
+    Cube.deleteOne(
+        { _id: selectedCubeId }
+        
+    )
+    .then(()=> {
+        console.log('deleted', selectedCubeId);
+    })  
+    .catch(err => { console.log(err);});
     res.redirect('/');
 
 });

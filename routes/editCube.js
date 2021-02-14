@@ -3,30 +3,34 @@ var router = express.Router();
 const Cube = require("../models/cube");
 
 /* GET details page for selected cube. */
-router.get('/:uid', function (req, res, next) {
-    let id = req.params.uid;
+router.get('/:id', function (req, res, next) {
+    let id = req.params.id;
 
-    Cube.findOne({ _id: id}).populate('accessories') //get access to all accessories attach to this cube
+    Cube.findOne({ _id: id}).populate('accessories') 
         .then((thisCube) => {
             res.render('editCube', {
-                title: 'Edit Cube ',
+                title: 'Edit Cube',
                 cube: thisCube
             });
         });
 });
 
 // POST
-router.post("/:uid", function (req, res, next) {
-    let selectedCubeId = req.params.uid;
+router.post("/:id", function (req, res, next) {
+    Cube.updateOne(
+        { _id: req.params.id },
+        {
+            name: req.body.name,
+            description: req.body.description,
+            imageUrl: req.body.imageUrl,
+            difficulty: req.body.difficultyLevel,
+        }
+        
+        
+    )
+    .catch(err => { console.log(err);});
 
-    Cube.findOneAndUpdate(
-        { _id: selectedCubeId },
-        { $push: { "accessories": selectedAccId } },
-        { upsert: true },
-        err => { if (err) {console.log(err);}}
-    );
-
-    res.redirect(`/details/${selectedCubeId}`);
+    res.redirect('/');
 });
 
 module.exports = router;
