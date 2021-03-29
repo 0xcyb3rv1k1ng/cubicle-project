@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const hbs = require('hbs');
 const mongoose = require('mongoose');
+var helpers = require('handlebars-helpers')();
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -17,6 +18,7 @@ var ensureAuthenticated = function(req, res, next) {
 
 // required router scripts
 const aboutRouter = require('./routes/about');
+const allCubesRouter = require('./routes/allCubes');
 const attachAccessoryRouter = require('./routes/attachAccessory');
 const cookieRouter = require('./routes/cookie');
 const createAccessoryRouter = require('./routes/createAccessory');
@@ -45,13 +47,20 @@ mongoose.connect(process.env.DB_URI, {
   .then((res) => console.log("Woohoo! DB Connected! Great job, Kev!"))
   .catch(err => console.error(err));
 
-// view engine setup
+// Handlebars helper
+//const { truncate } = require('./helpers/hbs');
+
+  // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials("./views/partials");
-hbs.registerHelper("isEqual", (a, b) => {
-  return a === b;
-});
+hbs.registerHelper('getShortDescription', function(length, description) {
+  if ( description.length > length ) {
+   return description.substring(0, length) + "...";
+  } else {
+   return description;
+  }
+ });
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -87,6 +96,7 @@ app.use(ensureAuthenticated);
 app.use('/create', createRouter);
 app.use('/createAccessory', createAccessoryRouter);
 app.use('/attachAccessory', attachAccessoryRouter);
+app.use('/allCubes', allCubesRouter);
 app.use('/editCube', editCubeRouter);
 app.use('/deleteCube', deleteCubeRouter);
 app.use('/cookie', cookieRouter);

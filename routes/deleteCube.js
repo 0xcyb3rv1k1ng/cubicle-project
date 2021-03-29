@@ -1,10 +1,11 @@
 var express = require("express");
 var router = express.Router();
 const Cube = require("../models/cube");
+const User = require('../models/user');
 
 /* GET details page for selected cube. */
-router.get('/:uid', function (req, res, next) {
-    let id = req.params.uid;
+router.get('/:id', function (req, res, next) {
+    let id = req.params.id;
 
     Cube.findOne({_id: id }) 
         .then((thisCube) => {
@@ -16,8 +17,8 @@ router.get('/:uid', function (req, res, next) {
 });
 
 /*DELETE*/
-router.post("/:uid", function (req, res, next) {
-    let selectedCubeId = req.params.uid;
+router.post("/:id", function (req, res, next) {
+    let selectedCubeId = req.params.id;
     console.log('deleting this', selectedCubeId);    
 
     Cube.deleteOne(

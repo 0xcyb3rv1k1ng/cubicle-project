@@ -14,9 +14,7 @@ router.post('/', function (req, res, next) {
     const newCube = new Cube({
         name: req.body.name,
         description: req.body.description,
-        imageUrl: req.body.imageUrl,
-        difficulty: req.body.difficultyLevel,
-        accessories: [],
+        
     });
 
     newCube.save()

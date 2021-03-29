@@ -1,12 +1,13 @@
 var express = require("express");
 var router = express.Router();
 const Cube = require("../models/cube");
+const User = require('../models/user');
 
 /* GET details page for selected cube. */
 router.get('/:id', function (req, res, next) {
     let id = req.params.id;
 
-    Cube.findOne({ _id: id}).populate('accessories') 
+    Cube.findOne({ _id: id}) 
         .then((thisCube) => {
             res.render('editCube', {
                 title: 'Edit Cube',
@@ -22,8 +23,7 @@ router.post("/:id", function (req, res, next) {
         {
             name: req.body.name,
             description: req.body.description,
-            imageUrl: req.body.imageUrl,
-            difficulty: req.body.difficultyLevel,
+            
         }
         
         

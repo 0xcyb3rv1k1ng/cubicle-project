@@ -6,10 +6,8 @@ const User = require('../models/user');
 /* GET home page */
 router.get('/', function (req, res, next) {
     Cube.find()
-        .sort({id: -1})
-        .limit(3)
         .then((cubes) => {
-            res.render('index', {
+            res.render('allCubes', {
                 title: 'Welcome to KingUni Wiki',
                 cube: cubes,
                 loggedInUser: req.user
